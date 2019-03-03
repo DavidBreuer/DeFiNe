@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="2.24"/>
+  <!-- interface-naming-policy project-wide -->
+  <object class="GtkAdjustment" id="adjustment1">
+    <property name="upper">180</property>
+    <property name="value">60</property>
+    <property name="step_increment">10</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkListStore" id="liststore1">
+    <columns>
+      <!-- column-name sampling -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">BFS</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">RMST</col>
+      </row>
+    </data>
+  </object>
+  <object class="GtkListStore" id="liststore2">
+    <columns>
+      <!-- column-name overlap -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">overlapping</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">exact</col>
+      </row>
+    </data>
+  </object>
+  <object class="GtkListStore" id="liststore3">
+    <columns>
+      <!-- column-name quality -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">pairwise</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">all-to-all</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">length</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">angle</col>
+      </row>
+    </data>
+  </object>
+  <object class="GtkListStore" id="liststore4">
+    <columns>
+      <!-- column-name objective -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">total</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">average</col>
+      </row>
+    </data>
+  </object>
+  <object class="GtkWindow" id="window1">
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">DeFiNe</property>
+    <property name="icon">DeFiNe_logo.png</property>
+    <signal name="destroy" handler="on_window1_destroy" swapped="no"/>
+    <child>
+      <object class="GtkTable" id="table1">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="n_rows">7</property>
+        <property name="n_columns">2</property>
+        <child>
+          <object class="GtkLabel" id="label1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="tooltip_text" translatable="yes">Choose the input graph to be disentangled. 
+
+Required file format is .gml. 
+
+Edge weights need to be stored as edge[weights]. 
+
+Node positions need to be stored as node[graphics[x/y/z]].
+
+Manual filament assignments may be stored as, e.g., edge[manual]='2-1,4-5', to indicate that the respective edge is the 1st edge in filament 2 and the 5th edge in filament 4.</property>
+            <property name="xalign">0</property>
+            <property name="xpad">9</property>
+            <property name="label" translatable="yes">Input graph</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label2">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="tooltip_text" translatable="yes">Choose whether the total of average roughness of the filament cover is minimized.
+
+"total" minimizes the total roughness, favoring longer filaments.
+
+"average" minimizes the average roughness, favoring shorter filaments.</property>
+            <property name="xalign">0</property>
+            <property name="xpad">9</property>
+            <property name="label" translatable="yes">Path sampling</property>
+          </object>
+          <packing>
+            <property name="top_attach">1</property>
+            <property name="bottom_attach">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label3">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="tooltip_text" translatable="yes">Choose whether overlapping filaments are allowed or not.
+
+"overlapping" allows overlapping filaments.
+
+"exact" forbids overlapping filaments.
+
+</property>
+            <property name="xalign">0</property>
+            <property name="xpad">9</property>
+            <property name="label" translatable="yes">Overlapping filaments</property>
+          </object>
+          <packing>
+            <property name="top_attach">2</property>
+            <property name="bottom_attach">3</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label4">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="tooltip_text" translatable="yes">Choose the roughness measure used to judge the quality of the filament cover.
+
+"pairwise" computes the average absolute different between adjacent edge weights along a filament.
+
+"all-to-all" computes the maximal difference between any two edge weights in the filament divided by the number of edges.
+
+"length" computes the square root of the number of edges per filament which leads to maximally long filaments.
+
+"angle" computes the maximal deflection angle between adjacent edges of a filament.</property>
+            <property name="xalign">0</property>
+            <property name="xpad">9</property>
+            <property name="label" translatable="yes">Roughness measure</property>
+          </object>
+          <packing>
+            <property name="top_attach">3</property>
+            <property name="bottom_attach">4</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label5">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="tooltip_text" translatable="yes">Choose the minimization objective of the filament cover problem.
+
+"total" minimizes the total sum of filament roughnesses.
+
+"avg" minimizes the average roughness of the filament cover.
+
+</property>
+            <property name="xalign">0</property>
+            <property name="xpad">9</property>
+            <property name="label" translatable="yes">Minimization objective</property>
+          </object>
+          <packing>
+            <property name="top_attach">4</property>
+            <property name="bottom_attach">5</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label6">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="tooltip_text" translatable="yes">Choose a threshold for the maximal angle between adjacent edges.
+
+Default angle is 60°. 
+smaller angles force straighter filaments.
+Larger angles allow more curved filaments.
+
+</property>
+            <property name="xalign">0</property>
+            <property name="xpad">9</property>
+            <property name="label" translatable="yes">Angle threshold</property>
+          </object>
+          <packing>
+            <property name="top_attach">5</property>
+            <property name="bottom_attach">6</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkProgressBar" id="progressbar1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+          </object>
+          <packing>
+            <property name="top_attach">6</property>
+            <property name="bottom_attach">7</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="button1">
+            <property name="label" translatable="yes">DeFiNe</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="tooltip_text" translatable="yes">Run DeFiNe to decompose the selected filamentous network.</property>
+            <property name="use_action_appearance">False</property>
+            <signal name="clicked" handler="on_button1_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+            <property name="top_attach">6</property>
+            <property name="bottom_attach">7</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkFileChooserButton" id="filechooserbutton1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBox" id="combobox1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="model">liststore1</property>
+            <property name="active">0</property>
+            <child>
+              <object class="GtkCellRendererText" id="cellrenderertext1"/>
+              <attributes>
+                <attribute name="text">0</attribute>
+              </attributes>
+            </child>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+            <property name="top_attach">1</property>
+            <property name="bottom_attach">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBox" id="combobox2">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="model">liststore2</property>
+            <property name="active">0</property>
+            <child>
+              <object class="GtkCellRendererText" id="cellrenderertext2"/>
+              <attributes>
+                <attribute name="text">0</attribute>
+              </attributes>
+            </child>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+            <property name="top_attach">2</property>
+            <property name="bottom_attach">3</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBox" id="combobox3">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="model">liststore3</property>
+            <property name="active">0</property>
+            <child>
+              <object class="GtkCellRendererText" id="cellrenderertext3"/>
+              <attributes>
+                <attribute name="text">0</attribute>
+              </attributes>
+            </child>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+            <property name="top_attach">3</property>
+            <property name="bottom_attach">4</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBox" id="combobox4">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="model">liststore4</property>
+            <property name="active">0</property>
+            <child>
+              <object class="GtkCellRendererText" id="cellrenderertext4"/>
+              <attributes>
+                <attribute name="text">0</attribute>
+              </attributes>
+            </child>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+            <property name="top_attach">4</property>
+            <property name="bottom_attach">5</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSpinButton" id="spinbutton1">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="invisible_char">●</property>
+            <property name="primary_icon_activatable">False</property>
+            <property name="secondary_icon_activatable">False</property>
+            <property name="primary_icon_sensitive">True</property>
+            <property name="secondary_icon_sensitive">True</property>
+            <property name="adjustment">adjustment1</property>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="right_attach">2</property>
+            <property name="top_attach">5</property>
+            <property name="bottom_attach">6</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

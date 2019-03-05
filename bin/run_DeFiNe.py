@@ -10,7 +10,7 @@ import DeFiNe.calc
 
 ##################################################################### run
 
-class DeFiNe:
+class DeFiNe_class:
 
     def __init__(self):
         self.builder=gtk.Builder()
@@ -38,7 +38,7 @@ class DeFiNe:
 
 
 if __name__ == '__main__':
-    app=DeFiNe()
+    app=DeFiNe_class()
     gtk.main()
 
 

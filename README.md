@@ -1,6 +1,6 @@
 ![](data/name.png)
 
-**De(composing) Fi(lamentous) Ne(tworks)**
+## De(composing) Fi(lamentous) Ne(tworks)
 
 Thread-like structures are pervasive across scales, from polymeric proteins to root systems to galaxy filaments,
 and their characteristics can be readily investigated in the network formalism. Yet, network links usually represent only parts of filaments,
@@ -18,7 +18,7 @@ in their network context.
 
 Please see [project website for details](http://mathbiol.mpimp-golm.mpg.de/DeFiNe/).
 
-**Instructions**
+## Instructions
 
 Install package via:
 
@@ -29,11 +29,11 @@ Run program via:
 - run_DeFiNe.py OR
 - cd bin && python2 run_DeFiNe.py
 
-**Citation**
+## Citation
 
-If this software is useful for your work, please include the following reference in your publication or redistribution:
+If this software is useful for your work, please include the following references in your publication or redistribution:
 
-Breuer and Nikoloski (2015) DeFiNe: an optimisation-based method for robust disentangling of filamentous networks. Sci. Rep., 5:18267.
+Breuer and Nikoloski (2015) [DeFiNe: an optimisation-based method for robust disentangling of filamentous networks](https://www.nature.com/articles/srep18267.pdf). Sci. Rep., 5:18267.
 
-Breuer et al. (2017) System-wide organization of actin cytoskeleton determines organelle transport in plant hypocotyl cells. PNAS, 10.1073/pnas.1706711114.
+Breuer et al. (2017) [System-wide organization of actin cytoskeleton determines organelle transport in plant hypocotyl cells](https://www.pnas.org/content/pnas/114/28/E5741.full.pdf). PNAS, 10.1073/pnas.1706711114.
 

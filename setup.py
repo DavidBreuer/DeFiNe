@@ -10,5 +10,5 @@ setup(name='DeFiNe',
       scripts=[
           'bin/run_DeFiNe.py',
       ],
-      python_requires='~=2',
+      python_requires='==2.*',
 )

@@ -20,10 +20,10 @@ import cvxopt.glpk
 ###################################################### help: gml
 
 def color2hex(col):
-    return ('#%02x%02x%02x'%tuple(np.multiply(col[:3],255))).replace('f','F')
+    return ('#%02x%02x%02x'%tuple(np.multiply(col[:3],255).astype(int))).replace('f','F')
 
 def graph2gml(gg,pos,path,epc=None):
-    ew=1.0*np.array([d['weight'] for u,v,d in gg.edges(data=1)])
+    ew=1.0*np.array([d['weight'] for u,v,d in gg.edges(data=True)])
     ew=ew/ew.max()
     ec=plt.cm.jet(ew)
     ly,lx=pos.shape
@@ -31,30 +31,28 @@ def graph2gml(gg,pos,path,epc=None):
     pox[:,:lx]=pos
     gg.graph['directed']=0
     gg.graph['defaultnodesize']=0
-    for i,n in enumerate(gg.nodes(data=1)):
+    for i,n in enumerate(gg.nodes(data=True)):
        n[1]['graphics']={'x':pox[i][0],'y':pox[i][1],'z':pox[i][2],'hasFill':0,'hasOutline':0}
-    for i,e in enumerate(gg.edges(data=1)):
+    for i,e in enumerate(gg.edges(data=True)):
         e[2]['graphics']={'targetArrow':'none','width':5.0*ew[i],'fill':color2hex(ec[i])}
     if(epc!='None'):
-        for i,e in enumerate(gg.edges(data=1)):
+        for i,e in enumerate(gg.edges(data=True)):
             e[2]['graphics']={'targetArrow':'none','width':5.0*ew[i],'fill':color2hex(epc[i])}
     nx.write_gml(gg,path)
     return None
 
 def gml2graph(path):
-
-    path='graph.gml'
-
+    print(path)
     gg1=nx.read_gml(path)
     E=gg1.number_of_edges()
     N=gg1.number_of_nodes()
     pos1=np.zeros((N,3))
     auto1=[range(E)]
     manu1=[range(E)]
-    NS=gg1.nodes(data=1)
-    ES=gg1.edges(data=1)
-    NK=NS[0][1]['graphics'].keys()
-    EK=ES[0][2].keys()
+    NS=gg1.nodes(data=True)
+    ES=gg1.edges(data=True)
+    NK=NS['0']['graphics'].keys()
+    EK=list(ES)[0][2].keys()
 
     if('x' in NK):
         pos1[:,0]=[n[1]['graphics']['x'] for n in NS]
@@ -102,7 +100,7 @@ def partition_graph(aa,bb,gg):
         lbl[g]=i
     gl=nx.relabel_nodes(gl,lbl)
 
-    ad=nx.all_pairs_shortest_path_length(gl)
+    ad=dict(nx.all_pairs_shortest_path_length(gl))
     am=np.zeros((E,E))
     for ni,n in enumerate(gl.nodes()):
         for mi,m in enumerate(gl.nodes()):
@@ -131,6 +129,7 @@ def partition_graph(aa,bb,gg):
 
 def partition_similarity(aa,bb,gg=None):
 
+    # aa,bb=auto,manu
     uu=set(np.hstack(bb))
     E=max(uu)+1
     aa=[set(a) for a in aa]
@@ -221,17 +220,18 @@ def partition_matching(aa,bb):
 
 def path_roughs(path,gg,pos):
     ec=[]
-    edges=gg.edges()
+    edges=list(gg.edges())
     s3=0.0
     for pi,(p0,p1) in enumerate(zip(path[:-1],path[1:])):
-        s3+=np.sqrt(np.sum((pos[p0]-pos[p1])**2))
+        i0,i1=int(p0),int(p1)
+        s3+=np.sqrt(np.sum((pos[i0]-pos[i1])**2))
         if(p1 in gg[p0].keys()):
             ec.append(gg[p0][p1]['capa'])
         else:
             ec.append(gg[p1][p0]['capa'])
     s1=len(ec)
     s2=np.sqrt(s1)
-    s4=s3/np.max([np.max([np.max(np.abs(pos[n]-pos[m])) for n in path]) for m in path])
+    s4=s3/np.max([np.max([np.max(np.abs(pos[int(n)]-pos[int(m)])) for n in path]) for m in path])
     if(s1>1):
         s5=np.mean(np.abs(np.diff(ec)))
         s6=1.0*(np.max(ec)-np.min(ec))/s1
@@ -257,12 +257,12 @@ def angle360xy(dxy):
 
 def path_angles(path,gg,pos):
     P=len(path)
-    edges=gg.edges()
+    edges=list(gg.edges())
     ang=[]
     for p in range(P-2):
         u,v,w=path[p:p+3]
-        duv=pos[u]-pos[v]
-        dvw=pos[v]-pos[w]
+        duv=pos[int(u)]-pos[int(v)]
+        dvw=pos[int(v)]-pos[int(w)]
         ang.append(angle180edges(duv,dvw))
     a1=len(ang)
     if(a1>0):
@@ -273,7 +273,7 @@ def path_angles(path,gg,pos):
         a2,a3,a4=0.0*np.ones(3)
     angles=[]
     for p in range(P-1):
-        p0,p1=path[p+0],path[p+1]
+        p0,p1=int(path[p+0]),int(path[p+1])
         angles.append(angle360xy(pos[p1]-pos[p0]))
     a5=np.mod(np.median(angle360smooth(angles)),180.0)
     return a1,a2,a3,a4,a5#len_lin,diff_mean,diff_max,diff_cv,abs_median
@@ -281,9 +281,10 @@ def path_angles(path,gg,pos):
 ###################################################### help: paths
 
 def random_spanning_tree(gg):
-    for u,v,d in gg.edges(data=1):
+    for u,v,d in gg.edges(data=True):
         d['rand']=1.0*sp.rand()
-    return nx.minimum_spanning_tree(gg,weight='rand')
+    gm = nx.minimum_spanning_tree(gg,weight='rand')
+    return gm
 
 def bfs_paths_angles(gg,pos,thres,start,goal):
     gx=nx.to_dict_of_dicts(gg)
@@ -319,9 +320,9 @@ def generate_paths(gg,pos,sample,thres,mode=0):
             print('RMST',i,sample)
             gm=random_spanning_tree(gg)
             pathd=nx.all_pairs_dijkstra_path(gm)
-            for n in pathd.keys():
-                for m in pathd[n].keys():
-                    path=pathd[n][m]
+            for idp, pathi in pathd:
+                for m in pathi.keys():
+                    path=pathi[m]
                     if(not path in paths and len(path)>1):
                         paths.append(path)
     return paths
@@ -489,10 +490,10 @@ def filament_color(eps,lbs,mp):
     C=len(mp)
     E=len(eps[0])
     ept=copy.deepcopy(eps)
-    ept[-np.isfinite(eps)]=0
+    ept[~np.isfinite(eps)]=0
     ept=ept.astype('int')
     epm=mp[ept].astype('float')
-    epm[-np.isfinite(eps)]=np.nan
+    epm[~np.isfinite(eps)]=np.nan
     epc=np.zeros((E,4))
     for i,e in enumerate(epm.T):
         epc[i]=np.nanmean(plt.cm.jet(1.0*e[e==e]/(C-1.0)),0)
@@ -508,13 +509,13 @@ def pathn2pathe(gg,pathx):
     pathe=[]
     for i,p in enumerate(pathx):
         path=[]
-        for pi in np.sort(zip(p[:-1],p[1:]),1):
+        for pi in np.sort(np.array(tuple(zip(p[:-1],p[1:]))),1):
             path.append(np.argmax(np.sum(edges==pi,1)==2))
         pathe.append(path)
     return pathe
 
 def pathe2pathn(gg,manu):
-    edges=gg.edges()
+    edges=list(gg.edges())
     pathn=[]
     for g in manu:
         start=[e for ei,e in enumerate(edges[g[0]]) if not e in edges[g[1]]][0]

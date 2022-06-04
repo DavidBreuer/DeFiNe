@@ -3,7 +3,6 @@
 
 import collections
 import copy
-import gtk
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -33,31 +32,34 @@ def calc(self,gtk,inp,sampling,overlap,quality,objective,angle):
     #message.destroy()
     #if result == gtk.RESPONSE_OK: #return 0
 
-#    inp='/home/breuer/graph.gml'
-#    sampling=1
-#    overlap=0
-#    quality=0
-#    objective=0
-#    angle=60.0
+    # inp='graph.gml'
+    # sampling=1
+    # overlap=0
+    # quality=0
+    # objective=0
+    # angle=60.0
 
-    ############################## read input
+    #%%############################# read input
 
-    self.builder.get_object('progressbar1').set_text('Reading .gml file.')
-    self.builder.get_object('progressbar1').set_fraction(0.25)
-    while gtk.events_pending(): gtk.main_iteration()
+    if self:
+        self.builder.get_object('progressbar1').set_text('Reading .gml file.')
+        self.builder.get_object('progressbar1').set_fraction(0.25)
+        while gtk.events_pending(): gtk.main_iteration()
 
     gg,pos,auto,manu=DeFiNe.help.gml2graph(inp)
+    pod = {str(i): vec for i, vec in enumerate(pos[:,:2])}
     random.shuffle(manu)
     pathm=DeFiNe.help.pathe2pathn(gg,manu)
     roughs=np.array([DeFiNe.help.path_roughs(p,gg,pos) for p in pathm])
     angles=np.array([DeFiNe.help.path_angles(p,gg,pos) for p in pathm])
     qualim=np.vstack([roughs.T,angles.T]).T
 
-    ############################## generate paths
+    # ############################# generate paths
 
-    self.builder.get_object('progressbar1').set_text('Generating input paths.')
-    self.builder.get_object('progressbar1').set_fraction(0.50)
-    while gtk.events_pending(): gtk.main_iteration()
+    if self:
+        self.builder.get_object('progressbar1').set_text('Generating input paths.')
+        self.builder.get_object('progressbar1').set_fraction(0.50)
+        while gtk.events_pending(): gtk.main_iteration()
 
     angle=int(angle)
     pathn=DeFiNe.help.generate_paths(gg,pos,50,angle,mode=sampling)
@@ -71,9 +73,10 @@ def calc(self,gtk,inp,sampling,overlap,quality,objective,angle):
 
     ############################## run FCP
 
-    self.builder.get_object('progressbar1').set_text('Solving filament cover problem.')
-    self.builder.get_object('progressbar1').set_fraction(0.75)
-    while gtk.events_pending(): gtk.main_iteration()
+    if self:
+        self.builder.get_object('progressbar1').set_text('Solving filament cover problem.')
+        self.builder.get_object('progressbar1').set_fraction(0.75)
+        while gtk.events_pending(): gtk.main_iteration()
 
     quali=[4,5,1,10][quality]
     if(objective==0):
@@ -88,9 +91,10 @@ def calc(self,gtk,inp,sampling,overlap,quality,objective,angle):
 
     ############################## extend graph
 
-    self.builder.get_object('progressbar1').set_text('Plotting filament cover and analyzes.')
-    self.builder.get_object('progressbar1').set_fraction(1.0)
-    while gtk.events_pending(): gtk.main_iteration()
+    if self:
+        self.builder.get_object('progressbar1').set_text('Plotting filament cover and analyzes.')
+        self.builder.get_object('progressbar1').set_fraction(1.0)
+        while gtk.events_pending(): gtk.main_iteration()
 
     me=[[] for e in gg.edges()]
     for gi,g in enumerate(manu):
@@ -100,11 +104,11 @@ def calc(self,gtk,inp,sampling,overlap,quality,objective,angle):
     for gi,g in enumerate(auto):
         for ei,e in enumerate(g):
             ae[e].append(str(gi)+'-'+str(ei))
-    for ei,e in enumerate(gg.edges(data=1)):
+    for ei,e in enumerate(gg.edges(data=True)):
         e[2]['manu']=';'.join(me[ei])
         e[2]['auto']=';'.join(ae[ei])
 
-    ############################## generate output
+    #%%############################# generate output
 
     name=inp[:-4]+'_sampling='+str(sampling)+'_overlap='+str(overlap)+'_quality='+str(quality)+'_objective='+str(objective)+'_angle='+str(angle)
     qualin=['rough_len_lin','rough_len_sq','rough_len_euc','rough_len_conv','rough_diff_pair','rough_diff_all','rough_abs_avg','rough_abs_cv','angle_len_lin','angle_diff_mean','angle_diff_max','angle_diff_cv','angle_abs_median','edge_assignment']
@@ -130,8 +134,9 @@ def calc(self,gtk,inp,sampling,overlap,quality,objective,angle):
     lbs,eps=DeFiNe.help.filament_label(manu,gg)
     lbc,epc,epm=DeFiNe.help.filament_color(eps,lbs,np.sort(mpp))
     DeFiNe.help.graph2gml(gg,pos,name+'_manu.gml',epc=epc)
-    nx.draw_networkx_edges(gg,pos[:,:2],edge_color=epc,width=2)
-    nx.draw_networkx_edge_labels(gg,pos[:,:2],edge_labels=lbc,font_color='black',font_size=5,bbox={'edgecolor':'none','facecolor':'none'})
+    nx.draw_networkx(gg,pod,edge_color=epc,width=2,node_size=0,edge_labels=lbc,font_color='black',font_size=5,bbox={'edgecolor':'none','facecolor':'none'})
+    # nx.draw_networkx_edges(gg,pod,edge_color=epc,width=2)
+    # nx.draw_networkx_edge_labels(gg,pod,edge_labels=lbc,font_color='black',font_size=5,bbox={'edgecolor':'none','facecolor':'none'})
     plt.ylim(plt.ylim()[::-1])
     plt.axis('off')
 
@@ -140,15 +145,16 @@ def calc(self,gtk,inp,sampling,overlap,quality,objective,angle):
     lbs,eps=DeFiNe.help.filament_label(auto,gg)
     lbc,epc,epm=DeFiNe.help.filament_color(eps,lbs,mpp)
     DeFiNe.help.graph2gml(gg,pos,name+'_auto.gml',epc=epc)
-    nx.draw_networkx_edges(gg,pos[:,:2],edge_color=epc,width=2)
-    nx.draw_networkx_edge_labels(gg,pos[:,:2],edge_labels=lbc,font_color='black',font_size=5,bbox={'edgecolor':'none','facecolor':'none'})
+    nx.draw_networkx(gg,pod,edge_color=epc,width=2,node_size=0,edge_labels=lbc,font_color='black',font_size=5,bbox={'edgecolor':'none','facecolor':'none'})
+    # nx.draw_networkx_edges(gg,pod,edge_color=epc,width=2)
+    # nx.draw_networkx_edge_labels(gg,pod,edge_labels=lbc,font_color='black',font_size=5,bbox={'edgecolor':'none','facecolor':'none'})
     plt.ylim(plt.ylim()[::-1])
     plt.axis('off')
 
     plt.subplot(2,4,3) # dist len
     s=0
     mm=max(qualim[:,s].max(),qualia[:,s].max())
-    sm=int(mm+10)/10*10
+    sm=int(int(mm+10)/10*10)
     plt.hist(qualim[:,s],range(sm+10),lw=2,color='black',histtype='step',align='mid',alpha=0.5)
     plt.hist(qualia[:,s],range(sm+10),lw=2,color='black',histtype='step',align='mid',alpha=1.0)
     plt.title('p_KS = '+'%.1e'%sp.stats.ks_2samp(qualim[:,s],qualia[:,s])[1])
@@ -191,15 +197,15 @@ def calc(self,gtk,inp,sampling,overlap,quality,objective,angle):
         man=qualim[:,0]>-99
     poly=np.polyfit(qualim[:,r][man],qualim[:,a][man],1)
     plt.plot(qualim[:,r],np.poly1d(poly)(qualim[:,r]),lw=2,color='black',alpha=0.5)
-    plt.plot(qualim[:,r][man],qualim[:,a][man],marker='s',ls='.',mew=2,mfc='none',mec=[0,0,0,0.5],alpha=0.5,ms=6,label='manu')
-    plt.plot(qualim[:,r][-man],qualim[:,a][-man],marker='s',ls='.',mew=2,mfc='none',mec=[0,0,0,0.5],alpha=0.5,ms=2)
+    plt.plot(qualim[:,r][man],qualim[:,a][man],marker='s',ls='',mew=2,mfc='none',mec=[0,0,0,0.5],alpha=0.5,ms=6,label='manu')
+    plt.plot(qualim[:,r][~man],qualim[:,a][~man],marker='s',ls='',mew=2,mfc='none',mec=[0,0,0,0.5],alpha=0.5,ms=2)
     aan=qualim[:,0]>1
     if(aan.sum()==0):
         aan=qualim[:,0]>-99
     poly=np.polyfit(qualim[:,r][aan],qualim[:,a][aan],1)
     plt.plot(qualim[:,r],np.poly1d(poly)(qualim[:,r]),lw=2,color='black',alpha=1.0)
-    plt.plot(qualim[:,r][aan],qualim[:,a][aan],marker='o',ls='.',mew=2,mfc='none',color=[0,0,0,1.0],alpha=1.0,ms=6,label='auto')
-    plt.plot(qualim[:,r][-aan],qualim[:,a][-aan],marker='o',ls='.',mew=2,mfc='none',color=[0,0,0,1.0],alpha=1.0,ms=2)
+    plt.plot(qualim[:,r][aan],qualim[:,a][aan],marker='o',ls='',mew=2,mfc='none',color=[0,0,0,1.0],alpha=1.0,ms=6,label='auto')
+    plt.plot(qualim[:,r][~aan],qualim[:,a][~aan],marker='o',ls='',mew=2,mfc='none',color=[0,0,0,1.0],alpha=1.0,ms=2)
     plt.title('auto p_tau = '+'%.1e'%sp.stats.kendalltau(qualim[:,r],qualim[:,a])[1]+'\n manu p_tau = '+'%.1e'%sp.stats.kendalltau(qualim[:,r],qualim[:,a])[1],ha='right')
     plt.legend(loc=0,frameon=0)
     plt.xlabel('filament weight')
@@ -210,8 +216,11 @@ def calc(self,gtk,inp,sampling,overlap,quality,objective,angle):
     plt.savefig(name+'.svg')
     #plt.show()
 
-    self.builder.get_object('progressbar1').set_text('Done.')
-    self.builder.get_object('progressbar1').set_fraction(0.0)
-    while gtk.events_pending(): gtk.main_iteration()
+    if self:
+        self.builder.get_object('progressbar1').set_text('Done.')
+        self.builder.get_object('progressbar1').set_fraction(0.0)
+        while gtk.events_pending(): gtk.main_iteration()
+
+    #%%############################# end script
 
     return 0

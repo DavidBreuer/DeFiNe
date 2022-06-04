@@ -22,12 +22,26 @@ Please see [project website for details](http://mathbiol.mpimp-golm.mpg.de/DeFiN
 
 Install package via:
 
-- sudo pip2 install -e .
+- pip install -r requirements.txt
+- pip install -e .
 
 Run program via:
 
 - run_DeFiNe.py OR
-- cd bin && python2 run_DeFiNe.py
+- cd bin && python run_DeFiNe.py
+
+Or without GUI:
+
+    import DeFiNe
+    import DeFiNe.calc
+    import DeFiNe.help
+    inp='graph.gml'
+    sampling=1
+    overlap=0
+    quality=0
+    objective=0
+    angle=60.0
+    DeFiNe.calc.calc(None,None,inp,sampling,overlap,quality,objective,angle)
 
 ## Citation
 

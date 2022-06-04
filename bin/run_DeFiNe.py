@@ -1,9 +1,16 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 ##################################################################### imports
 
 import os
-import gtk
+import sys
+
+if sys.version_info.major == 2:
+    import gtk
+else:
+    import pgi
+    pgi.install_as_gi()
+    from gi.repository import Gtk as gtk
 
 import DeFiNe
 import DeFiNe.calc
@@ -27,6 +34,7 @@ class DeFiNe_class:
     def on_button1_clicked(self,object):
         print('Running DeFiNe.')
         inp=str(self.builder.get_object('filechooserbutton1').get_filename()).replace('\\','/')
+        print(inp)
         sampling=self.builder.get_object('combobox1').get_active()
         overlap=1-self.builder.get_object('combobox2').get_active()
         quality=self.builder.get_object('combobox3').get_active()

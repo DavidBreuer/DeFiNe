@@ -73,7 +73,7 @@
   <object class="GtkWindow" id="window1">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">DeFiNe</property>
-    <property name="icon">DeFiNe_logo.png</property>
+    <property name="icon">logo.png</property>
     <signal name="destroy" handler="on_window1_destroy" swapped="no"/>
     <child>
       <object class="GtkTable" id="table1">
@@ -85,11 +85,11 @@
           <object class="GtkLabel" id="label1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="tooltip_text" translatable="yes">Choose the input graph to be disentangled. 
+            <property name="tooltip_text" translatable="yes">Choose the input graph to be disentangled.
 
-Required file format is .gml. 
+Required file format is .gml.
 
-Edge weights need to be stored as edge[weights]. 
+Edge weights need to be stored as edge[weights].
 
 Node positions need to be stored as node[graphics[x/y/z]].
 
@@ -185,7 +185,7 @@ Manual filament assignments may be stored as, e.g., edge[manual]='2-1,4-5', to i
             <property name="can_focus">False</property>
             <property name="tooltip_text" translatable="yes">Choose a threshold for the maximal angle between adjacent edges.
 
-Default angle is 60°. 
+Default angle is 60°.
 smaller angles force straighter filaments.
 Larger angles allow more curved filaments.
 
